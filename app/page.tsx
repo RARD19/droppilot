@@ -277,45 +277,42 @@ export default function Home() {
   }
 
   async function resetMarket() {
-    const confirmed = confirm(
-      '¿Reiniciar todas las ventas del mercado?'
-    )
+  const confirmed = confirm(
+    '¿Reiniciar todas las ventas del mercado?'
+  )
 
-    if (!confirmed) return
+  if (!confirmed) return
 
-    const { error } = await supabase
-      .from('sales')
-      .delete()
-      .neq('id', 0)
+  const { error } = await supabase.rpc('reset_market')
 
-    if (error) {
-      alert(error.message)
-      return
-    }
-
-    location.reload()
+  if (error) {
+    alert(error.message)
+    return
   }
 
-  async function deleteProduct(id: number) {
-    const confirmed = confirm(
-      '¿Eliminar este producto?'
-    )
+  await fetchRadar()
+}
 
-    if (!confirmed) return
+async function deleteProduct(id: number) {
+  const confirmed = confirm(
+    '¿Eliminar este producto?'
+  )
 
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id)
+  if (!confirmed) return
 
-    if (error) {
-      alert(error.message)
-    } else {
-      await fetchRadar()
-    }
+  const { error } = await supabase
+    .from('products')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    alert(error.message)
+  } else {
+    await fetchRadar()
   }
+}  
 
-  function getColor(label: string) {
+function getColor(label: string) {
     switch (label) {
       case '🔥 WINNER':
         return 'text-green-400'
