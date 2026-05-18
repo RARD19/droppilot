@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase'
 export default function Home() {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [dailySales, setDailySales] = useState<any[]>([])
 
   const [filter, setFilter] = useState('Todos')
 
@@ -28,13 +29,16 @@ export default function Home() {
   const [password, setPassword] = useState('')
   const [authLoading, setAuthLoading] = useState(true)
 
-  const chartData = products.map((p) => ({
+  const chartData = products
+  .map((p) => ({
     name:
-      p.name.length > 12
-        ? p.name.slice(0, 12) + '...'
+      p.name.length > 14
+        ? p.name.slice(0, 14) + '...'
         : p.name,
-    ventas: p.times_sold || 0
+    ventas: Number(p.times_sold || 0)
   }))
+  .filter((p) => p.ventas > 0)
+  .sort((a, b) => b.ventas - a.ventas)
 
   const filteredProducts =
     filter === 'Todos'
@@ -82,6 +86,54 @@ export default function Home() {
       setAuthLoading(false)
 
       if (data.session) {
+
+async function fetchDailySales() {
+  const fromDate = new Date()
+  fromDate.setDate(fromDate.getDate() - 6)
+  fromDate.setHours(0, 0, 0, 0)
+
+  const { data, error } = await supabase
+    .from('sales')
+    .select('created_at, sale_amount_eur')
+    .gte('created_at', fromDate.toISOString())
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error(error)
+    return
+  }
+
+  const days = []
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+
+    const key = date.toISOString().slice(0, 10)
+
+    days.push({
+      date: key,
+      dia: date.toLocaleDateString('es-ES', {
+        weekday: 'short'
+      }),
+      ventas: 0,
+      revenue: 0
+    })
+  }
+
+  data?.forEach((sale) => {
+    const key = new Date(sale.created_at).toISOString().slice(0, 10)
+    const day = days.find((d) => d.date === key)
+
+    if (day) {
+      day.ventas += 1
+      day.revenue += Number(sale.sale_amount_eur || 0)
+    }
+  })
+
+  setDailySales(days)
+}
+
         fetchRadar()
       }
     }
@@ -105,6 +157,53 @@ export default function Home() {
     }
   }, [])
 
+  async function fetchDailySales() {
+  const fromDate = new Date()
+  fromDate.setDate(fromDate.getDate() - 6)
+  fromDate.setHours(0, 0, 0, 0)
+
+  const { data, error } = await supabase
+    .from('sales')
+    .select('created_at, sale_amount_eur')
+    .gte('created_at', fromDate.toISOString())
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error(error)
+    return
+  }
+
+  const days = []
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+
+    const key = date.toISOString().slice(0, 10)
+
+    days.push({
+      date: key,
+      dia: date.toLocaleDateString('es-ES', {
+        weekday: 'short'
+      }),
+      ventas: 0,
+      revenue: 0
+    })
+  }
+
+  data?.forEach((sale) => {
+    const key = new Date(sale.created_at).toISOString().slice(0, 10)
+    const day = days.find((d) => d.date === key)
+
+    if (day) {
+      day.ventas += 1
+      day.revenue += Number(sale.sale_amount_eur || 0)
+    }
+  })
+
+  setDailySales(days)
+}
+  
   async function fetchRadar() {
     setLoading(true)
 
@@ -120,6 +219,8 @@ export default function Home() {
       setProducts(data || [])
     }
 
+    await fetchDailySales()
+    
     setLoading(false)
   }
 
@@ -560,15 +661,50 @@ function getColor(label: string) {
             <div style={{ width: '100%', height: 320 }}>
               <ResponsiveContainer>
                 <BarChart data={chartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="ventas" />
-                </BarChart>
+  <XAxis
+    dataKey="name"
+    interval={0}
+    angle={-20}
+    textAnchor="end"
+    height={70}
+  />
+  <YAxis allowDecimals={false} />
+  <Tooltip
+    contentStyle={{
+      backgroundColor: '#111827',
+      border: '1px solid #374151',
+      borderRadius: '12px',
+      color: '#ffffff'
+    }}
+    cursor={{ fill: '#1f2937' }}
+  />
+  <Bar
+    dataKey="ventas"
+    fill="#22c55e"
+    radius={[8, 8, 0, 0]}
+  />
+</BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         </section>
+
+        <div className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-5">
+  <h2 className="mb-4 text-lg font-bold">
+    📈 Ventas últimos 7 días
+  </h2>
+
+  <div style={{ width: '100%', height: 300 }}>
+    <ResponsiveContainer>
+      <BarChart data={dailySales}>
+        <XAxis dataKey="dia" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="ventas" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
         {loading && (
           <p className="mb-4 text-gray-400">Cargando productos...</p>
