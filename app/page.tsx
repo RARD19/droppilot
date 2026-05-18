@@ -17,6 +17,7 @@ export default function Home() {
   const [dailySales, setDailySales] = useState<any[]>([])
 
   const [filter, setFilter] = useState('Todos')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
@@ -40,14 +41,17 @@ export default function Home() {
   .filter((p) => p.ventas > 0)
   .sort((a, b) => b.ventas - a.ventas)
 
-  const filteredProducts =
-    filter === 'Todos'
-      ? products
-      : products.filter(
-          (p) =>
-            p.category === filter ||
-            p.decision_label === filter
-        )
+  const filteredProducts = products.filter((p) => {
+  const matchesFilter =
+    filter === 'Todos' ||
+    p.category === filter ||
+    p.decision_label === filter
+
+  const matchesSearch =
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+
+  return matchesFilter && matchesSearch
+})
 
   const totalRevenue = products.reduce(
     (acc, p) => acc + Number(p.total_revenue || 0),
@@ -559,6 +563,13 @@ function getColor(label: string) {
               <option>Tech</option>
               <option>Security</option>
             </select>
+
+            <input
+  className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm outline-none focus:border-blue-500"
+  placeholder="Buscar producto..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
 
             <button
               onClick={simulateSales}
