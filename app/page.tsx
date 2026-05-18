@@ -325,7 +325,7 @@ function getColor(label: string) {
     }
   }
 
-  if (authLoading) {
+    if (authLoading) {
     return (
       <div className="p-6 bg-black min-h-screen text-white">
         Cargando...
@@ -368,202 +368,220 @@ function getColor(label: string) {
   }
 
   return (
-    <div className="p-6 bg-black min-h-screen text-white">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">
-          🚀 DropPilot Radar
-        </h1>
-
-        <button
-          onClick={logout}
-          className="bg-gray-700 px-4 py-2 rounded-lg"
-        >
-          Cerrar sesión
-        </button>
-      </div>
-
-      <div className="flex flex-wrap gap-4 mb-6">
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="p-2 bg-gray-800 rounded"
-        >
-          <option>Todos</option>
-          <option>🔥 WINNER</option>
-          <option>🟢 STRONG</option>
-          <option>🟡 AVERAGE</option>
-          <option>🔴 WEAK</option>
-          <option>Electronics</option>
-          <option>Lifestyle</option>
-          <option>Home</option>
-          <option>Tech</option>
-          <option>Security</option>
-        </select>
-
-        <button
-          onClick={simulateSales}
-          className="bg-purple-600 px-4 py-2 rounded-lg"
-        >
-          ⚡ Simular mercado
-        </button>
-
-        <button
-          onClick={resetMarket}
-          className="bg-red-600 px-4 py-2 rounded-lg"
-        >
-          🗑 Reiniciar mercado
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-900 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Revenue Total</p>
-          <p className="text-xl font-bold">
-            €{totalRevenue.toFixed(2)}
-          </p>
-        </div>
-
-        <div className="bg-gray-900 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Ventas Totales</p>
-          <p className="text-xl font-bold">{totalSales}</p>
-        </div>
-
-        <div className="bg-gray-900 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Producto líder</p>
-          <p className="text-lg font-bold truncate">
-            {topProduct}
-          </p>
-        </div>
-
-        <div className="bg-gray-900 p-4 rounded-xl">
-          <p className="text-sm text-gray-400">Score promedio</p>
-          <p className="text-xl font-bold">{avgScore}</p>
-        </div>
-      </div>
-
-      <div className="mb-8 p-4 bg-gray-900 rounded-xl">
-        <h2 className="mb-4 font-bold">
-          {editingId ? 'Editar producto' : 'Agregar producto'}
-        </h2>
-
-        <div className="grid gap-2">
-          <input
-            className="p-2 bg-gray-800 rounded"
-            placeholder="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <input
-            className="p-2 bg-gray-800 rounded"
-            placeholder="Categoría"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-
-          <input
-            className="p-2 bg-gray-800 rounded"
-            placeholder="Precio"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-
-          <input
-            className="p-2 bg-gray-800 rounded"
-            placeholder="País"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-          />
+    <div className="min-h-screen bg-black text-white">
+      <div className="mx-auto max-w-7xl p-6">
+        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm text-gray-400">
+              Product intelligence dashboard
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight">
+              🚀 DropPilot Radar
+            </h1>
+          </div>
 
           <button
-            onClick={addProduct}
-            className="bg-blue-600 p-2 rounded"
+            onClick={logout}
+            className="rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700"
           >
-            {editingId ? 'Actualizar producto' : 'Generar producto'}
+            Cerrar sesión
           </button>
+        </header>
 
-          {editingId && (
-            <button
-              onClick={clearForm}
-              className="bg-gray-700 p-2 rounded"
+        <section className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-4">
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm"
             >
-              Cancelar edición
+              <option>Todos</option>
+              <option>🔥 WINNER</option>
+              <option>🟢 STRONG</option>
+              <option>🟡 AVERAGE</option>
+              <option>🔴 WEAK</option>
+              <option>Electronics</option>
+              <option>Lifestyle</option>
+              <option>Home</option>
+              <option>Tech</option>
+              <option>Security</option>
+            </select>
+
+            <button
+              onClick={simulateSales}
+              className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-500"
+            >
+              ⚡ Simular mercado
             </button>
-          )}
-        </div>
-      </div>
 
-      {loading && <p>Cargando...</p>}
+            <button
+              onClick={resetMarket}
+              className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-500"
+            >
+              🗑 Reiniciar mercado
+            </button>
+          </div>
+        </section>
 
-      <div className="mb-8 p-4 bg-gray-900 rounded-xl">
-        <h2 className="mb-4 font-bold">📊 Ventas por producto</h2>
+        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+            <p className="text-sm text-gray-400">Revenue Total</p>
+            <p className="mt-2 text-2xl font-bold">
+              €{totalRevenue.toFixed(2)}
+            </p>
+          </div>
 
-        <div style={{ width: '100%', height: 300 }}>
-          <ResponsiveContainer>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="ventas" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+            <p className="text-sm text-gray-400">Ventas Totales</p>
+            <p className="mt-2 text-2xl font-bold">{totalSales}</p>
+          </div>
 
-      <div className="grid gap-4">
-        {filteredProducts.map((p) => (
-          <div
-            key={p.id}
-            className="p-4 bg-gray-900 rounded-xl"
-          >
-            <div className="flex justify-between gap-4">
-              <h2>{p.name}</h2>
-              <span className={getColor(p.decision_label)}>
-                {p.decision_label}
-              </span>
-            </div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+            <p className="text-sm text-gray-400">Producto líder</p>
+            <p className="mt-2 truncate text-xl font-bold">
+              {topProduct}
+            </p>
+          </div>
 
-            <div className="mt-2 text-sm">
-              <p>{p.category} • {p.target_country}</p>
-              <p>💰 €{p.price_eur}</p>
-              <p>
-                📊 Score: {Number(p.raw_score || p.ai_score).toFixed(2)}
-              </p>
-              <p>📦 Vendidos: {p.times_sold || 0}</p>
-              <p>💵 Revenue: €{p.total_revenue || 0}</p>
-              <p>
-                📈 Top:{' '}
-                {p.percentile
-                  ? (p.percentile * 100).toFixed(0)
-                  : '--'}
-                %
-              </p>
-            </div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+            <p className="text-sm text-gray-400">Score promedio</p>
+            <p className="mt-2 text-2xl font-bold">{avgScore}</p>
+          </div>
+        </section>
 
-            <div className="flex flex-wrap gap-2 mt-4">
+        <section className="mb-8 grid gap-6 lg:grid-cols-3">
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-1">
+            <h2 className="mb-4 text-lg font-bold">
+              {editingId ? 'Editar producto' : 'Agregar producto'}
+            </h2>
+
+            <div className="grid gap-3">
+              <input
+                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+                placeholder="Nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+
+              <input
+                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+                placeholder="Categoría"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
+
+              <input
+                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+                placeholder="Precio"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+
+              <input
+                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+                placeholder="País"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              />
+
               <button
-                onClick={() => registerSale(p)}
-                className="bg-green-600 px-4 py-2 rounded-lg"
+                onClick={addProduct}
+                className="rounded-xl bg-blue-600 p-3 text-sm font-semibold hover:bg-blue-500"
               >
-                ➕ Registrar venta
+                {editingId ? 'Actualizar producto' : 'Generar producto'}
               </button>
 
-              <button
-                onClick={() => deleteProduct(p.id)}
-                className="bg-red-700 px-4 py-2 rounded-lg"
-              >
-                🗑 Eliminar
-              </button>
-
-              <button
-                onClick={() => editProduct(p)}
-                className="bg-yellow-600 px-4 py-2 rounded-lg"
-              >
-                ✏️ Editar
-              </button>
+              {editingId && (
+                <button
+                  onClick={clearForm}
+                  className="rounded-xl bg-gray-800 p-3 text-sm font-semibold hover:bg-gray-700"
+                >
+                  Cancelar edición
+                </button>
+              )}
             </div>
           </div>
-        ))}
+
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-2">
+            <h2 className="mb-4 text-lg font-bold">📊 Ventas por producto</h2>
+
+            <div style={{ width: '100%', height: 320 }}>
+              <ResponsiveContainer>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="ventas" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        {loading && (
+          <p className="mb-4 text-gray-400">Cargando productos...</p>
+        )}
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filteredProducts.map((p) => (
+            <div
+              key={p.id}
+              className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-gray-700"
+            >
+              <div className="mb-3 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold">{p.name}</h2>
+                  <p className="mt-1 text-sm text-gray-400">
+                    {p.category} • {p.target_country}
+                  </p>
+                </div>
+
+                <span className={`${getColor(p.decision_label)} whitespace-nowrap text-sm font-bold`}>
+                  {p.decision_label}
+                </span>
+              </div>
+
+              <div className="grid gap-2 rounded-xl bg-gray-900 p-4 text-sm">
+                <p>💰 Precio: €{p.price_eur}</p>
+                <p>
+                  📊 Score: {Number(p.raw_score || p.ai_score).toFixed(2)}
+                </p>
+                <p>📦 Vendidos: {p.times_sold || 0}</p>
+                <p>💵 Revenue: €{p.total_revenue || 0}</p>
+                <p>
+                  📈 Top:{' '}
+                  {p.percentile
+                    ? (p.percentile * 100).toFixed(0)
+                    : '--'}
+                  %
+                </p>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <button
+                  onClick={() => registerSale(p)}
+                  className="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium hover:bg-green-500"
+                >
+                  ➕ Venta
+                </button>
+
+                <button
+                  onClick={() => editProduct(p)}
+                  className="rounded-xl bg-yellow-600 px-3 py-2 text-sm font-medium hover:bg-yellow-500"
+                >
+                  ✏️ Editar
+                </button>
+
+                <button
+                  onClick={() => deleteProduct(p.id)}
+                  className="rounded-xl bg-red-700 px-3 py-2 text-sm font-medium hover:bg-red-600"
+                >
+                  🗑 Eliminar
+                </button>
+              </div>
+            </div>
+          ))}
+        </section>
       </div>
     </div>
   )
