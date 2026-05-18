@@ -697,11 +697,23 @@ function getColor(label: string) {
   <div style={{ width: '100%', height: 300 }}>
     <ResponsiveContainer>
       <BarChart data={dailySales}>
-        <XAxis dataKey="dia" />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="ventas" />
-      </BarChart>
+  <XAxis dataKey="dia" />
+  <YAxis allowDecimals={false} />
+  <Tooltip
+    contentStyle={{
+      backgroundColor: '#111827',
+      border: '1px solid #374151',
+      borderRadius: '12px',
+      color: '#ffffff'
+    }}
+    cursor={{ fill: '#1f2937' }}
+  />
+  <Bar
+    dataKey="ventas"
+    fill="#3b82f6"
+    radius={[8, 8, 0, 0]}
+  />
+</BarChart>
     </ResponsiveContainer>
   </div>
 </div>
