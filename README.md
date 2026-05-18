@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DropPilot
 
-## Getting Started
+DropPilot is a product testing and market simulation dashboard built with Next.js and Supabase.
 
-First, run the development server:
+The goal of the project is to help evaluate potential dropshipping products by tracking product data, simulated sales, revenue, scores, and opportunity ranking.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Deployed on Vercel:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`https://droppilot.vercel.app/`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
 
-## Learn More
+- User authentication with Supabase Auth
+- Product creation, editing, and deletion
+- Sales registration per product
+- Market simulation based on product score
+- Market reset using a secure Supabase RPC function
+- Dynamic product ranking
+- Opportunity labels:
+  - 🔥 WINNER
+  - 🟢 STRONG
+  - 🟡 AVERAGE
+  - 🔴 WEAK
+- Revenue and sales KPIs
+- Product leader detection
+- Average score calculation
+- Sales chart by product
+- Filters by category and opportunity status
+- Protected access for authenticated users only
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Supabase
+  - Database
+  - Auth
+  - Row Level Security
+  - RPC functions
+  - Triggers
+- Recharts
+- Vercel
+- GitHub
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Main Tables
 
-## Deploy on Vercel
+### products
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Stores product data such as:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- name
+- category
+- price
+- target country
+- AI score
+- active status
+
+### sales
+
+Stores product sales data:
+
+- product ID
+- sale amount in EUR
+- sale amount in BRL
+- creation date
+
+### product_metrics
+
+Stores aggregated product performance:
+
+- times sold
+- total revenue
+- updated timestamp
+
+### product_radar
+
+A database view used by the dashboard to calculate:
+
+- total sales
+- total revenue
+- raw score
+- percentile
+- opportunity label
+
+## How the Scoring Works
+
+DropPilot combines two types of signals:
+
+1. Prediction-based score  
+   Used when a product has no sales yet.
+
+2. Performance-based score  
+   Used when the product has sales history.
+
+This allows new products to be evaluated before real data exists, while also allowing proven products to rise based on actual performance.
+
+The current scoring system uses:
+
+- AI score
+- number of sales
+- total revenue
+- weighted market simulation
+
+## Authentication and Security
+
+The dashboard requires login through Supabase Auth.
+
+Database access is restricted to authenticated users.
+
+Public anonymous access is disabled for the main tables.
+
+The market reset feature is handled through a Supabase RPC function instead of direct frontend deletion.
+
+## Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://msympbajofipaqnrysvq.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zeW1wYmFqb2ZpcGFxbnJ5c3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDc5MDYsImV4cCI6MjA5MzYyMzkwNn0.FXgyZ--wejB-yss2J7THVLFYMk4GylTTbPjLyDdwsPg
