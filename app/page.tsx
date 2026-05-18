@@ -733,8 +733,14 @@ function getColor(label: string) {
           <p className="mb-4 text-gray-400">Cargando productos...</p>
         )}
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredProducts.map((p) => (
+        {filteredProducts.length === 0 && (
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 text-gray-400">
+    No se encontraron productos con ese filtro o búsqueda.
+  </div>
+)}
+
+<section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+  {filteredProducts.map((p) => (
             <div
               key={p.id}
               className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-gray-700"
