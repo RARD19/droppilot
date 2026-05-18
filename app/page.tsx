@@ -295,15 +295,14 @@ export default function Home() {
 
 async function deleteProduct(id: number) {
   const confirmed = confirm(
-    '¿Eliminar este producto?'
+    '¿Eliminar este producto y sus ventas asociadas?'
   )
 
   if (!confirmed) return
 
-  const { error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id)
+  const { error } = await supabase.rpc('delete_product', {
+    p_product_id: id
+  })
 
   if (error) {
     alert(error.message)
@@ -311,6 +310,59 @@ async function deleteProduct(id: number) {
     await fetchRadar()
   }
 }  
+
+function getRecommendation(product: any) {
+  const sales = Number(product.times_sold || 0)
+  const revenue = Number(product.total_revenue || 0)
+  const score = Number(product.raw_score || product.ai_score || 0)
+  const label = product.decision_label
+
+  if (label === '🔥 WINNER' && sales >= 3 && revenue > 0) {
+    return {
+      action: 'Escalar',
+      reason: 'Tiene ventas reales, buen revenue y un score alto.',
+      nextStep: 'Priorizar este producto y probar más presupuesto.'
+    }
+  }
+
+  if ((label === '🔥 WINNER' || label === '🟢 STRONG') && sales === 0) {
+    return {
+      action: 'Testear',
+      reason: 'Tiene buen potencial, pero todavía no tiene ventas registradas.',
+      nextStep: 'Hacer una prueba inicial antes de invertir fuerte.'
+    }
+  }
+
+  if (label === '🟢 STRONG' && sales > 0) {
+    return {
+      action: 'Seguir probando',
+      reason: 'Ya muestra señales positivas, pero aún puede necesitar más datos.',
+      nextStep: 'Registrar más ventas y observar si mantiene el rendimiento.'
+    }
+  }
+
+  if (label === '🟡 AVERAGE') {
+    return {
+      action: 'Observar',
+      reason: 'Tiene potencial medio, pero no destaca claramente frente a otros productos.',
+      nextStep: 'Compararlo con productos similares antes de priorizarlo.'
+    }
+  }
+
+  if (score < 30 || label === '🔴 WEAK') {
+  return {
+    action: 'Pausar',
+    reason: 'Está por debajo de otros productos del radar o no muestra suficiente tracción.',
+    nextStep: 'No priorizarlo por ahora. Revisar precio, país, categoría o esperar más datos.'
+  }
+}
+
+  return {
+    action: 'Analizar',
+    reason: 'El producto necesita más información antes de tomar una decisión.',
+    nextStep: 'Registrar más datos o simular mercado.'
+  }
+}
 
 function getColor(label: string) {
     switch (label) {
@@ -556,6 +608,33 @@ function getColor(label: string) {
                   %
                 </p>
               </div>
+
+              {(() => {
+  const recommendation = getRecommendation(p)
+
+  return (
+    <div className="mt-4 rounded-xl border border-gray-800 bg-gray-900 p-4 text-sm">
+      <p className="mb-2 font-bold text-blue-300">
+        🧠 Recomendación DropPilot
+      </p>
+
+      <p>
+        <span className="text-gray-400">Acción:</span>{' '}
+        {recommendation.action}
+      </p>
+
+      <p className="mt-1">
+        <span className="text-gray-400">Motivo:</span>{' '}
+        {recommendation.reason}
+      </p>
+
+      <p className="mt-1">
+        <span className="text-gray-400">Siguiente paso:</span>{' '}
+        {recommendation.nextStep}
+      </p>
+    </div>
+  )
+})()}
 
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <button
