@@ -25,6 +25,8 @@ export default function Home() {
   const [price, setPrice] = useState('')
   const [cost, setCost] = useState('')
   const [country, setCountry] = useState('')
+  const [supplierUrl, setSupplierUrl] = useState('')
+  const [notes, setNotes] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const categoryOptions = [
   'Electronics',
@@ -376,18 +378,20 @@ const actionSummary = [
       const { data, error } = await supabase
         .from('products')
         .update({
-          name,
-          category,
-          price_eur: Number(price),
-          cost_eur: Number(cost),
-          target_country: country,
-          ai_score:
-            Number(price) < 50
-              ? 85
-              : Number(price) < 100
-              ? 65
-              : 35
-        })
+  name,
+  category,
+  price_eur: Number(price),
+  cost_eur: Number(cost),
+  target_country: country,
+  supplier_url: supplierUrl,
+  notes,
+  ai_score:
+    Number(price) < 50
+      ? 85
+      : Number(price) < 100
+      ? 65
+      : 35
+})
         .eq('id', editingId)
         .select()
 
@@ -407,21 +411,23 @@ const actionSummary = [
     const { error } = await supabase
       .from('products')
       .insert([
-        {
-          name,
-          category,
-          price_eur: Number(price),
-          cost_eur: Number(cost),
-          target_country: country,
-          ai_score:
-            Number(price) < 50
-              ? 85
-              : Number(price) < 100
-              ? 65
-              : 35,
-          active: true
-        }
-      ])
+  {
+    name,
+    category,
+    price_eur: Number(price),
+    cost_eur: Number(cost),
+    target_country: country,
+    supplier_url: supplierUrl,
+    notes,
+    ai_score:
+      Number(price) < 50
+        ? 85
+        : Number(price) < 100
+        ? 65
+        : 35,
+    active: true
+  }
+])
 
     if (error) {
       alert(error.message)
@@ -671,6 +677,8 @@ function exportCSV() {
       Nombre: p.name,
       Categoria: p.category,
       Pais: p.target_country,
+      Proveedor: p.supplier_url || '',
+      Notas: p.notes || '',
       PrecioEUR: p.price_eur,
       CostoEUR: p.cost_eur || 0,
       ProfitUnidadEUR: Number(p.unit_profit || 0).toFixed(2),
@@ -1053,6 +1061,20 @@ function getColor(label: string) {
         ))}
       </select>
 
+      <input
+  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+  placeholder="Link del proveedor"
+  value={supplierUrl}
+  onChange={(e) => setSupplierUrl(e.target.value)}
+/>
+
+<textarea
+  className="min-h-24 rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+  placeholder="Notas del producto"
+  value={notes}
+  onChange={(e) => setNotes(e.target.value)}
+/>
+      
       <button
         onClick={addProduct}
         className="rounded-xl bg-blue-600 p-3 text-sm font-semibold hover:bg-blue-500"
@@ -1223,6 +1245,31 @@ function getColor(label: string) {
                   %
                 </p>
               </div>
+
+              {(p.supplier_url || p.notes) && (
+  <div className="mt-4 rounded-xl bg-gray-900 p-4 text-sm">
+    {p.supplier_url && (
+      <p>
+        🔗 Proveedor:{' '}
+        <a
+          href={p.supplier_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-300 underline"
+        >
+          Abrir link
+        </a>
+      </p>
+    )}
+
+    {p.notes && (
+      <p className="mt-2 text-gray-300">
+        📝 {p.notes}
+      </p>
+    )}
+  </div>
+)}
+
 
               {(() => {
   const recommendation = getRecommendation(p)
