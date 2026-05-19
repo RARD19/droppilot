@@ -101,6 +101,40 @@ const countryOptions = [
 
       const recommendedProduct = products[0] || null
 
+      const recommendationCounts = products.reduce((acc, product) => {
+  const action = getRecommendation(product).action
+  acc[action] = (acc[action] || 0) + 1
+  return acc
+}, {} as Record<string, number>)
+
+const actionSummary = [
+  {
+    label: 'Escalar',
+    emoji: '🚀',
+    count: recommendationCounts['Escalar'] || 0
+  },
+  {
+    label: 'Testear',
+    emoji: '🧪',
+    count: recommendationCounts['Testear'] || 0
+  },
+  {
+    label: 'Seguir probando',
+    emoji: '🔁',
+    count: recommendationCounts['Seguir probando'] || 0
+  },
+  {
+    label: 'Observar',
+    emoji: '👀',
+    count: recommendationCounts['Observar'] || 0
+  },
+  {
+    label: 'Pausar',
+    emoji: '⏸',
+    count: recommendationCounts['Pausar'] || 0
+  }
+]
+
   useEffect(() => {
     async function loadSession() {
       const { data } = await supabase.auth.getSession()
@@ -713,30 +747,56 @@ function getColor(label: string) {
 })()}
         
         <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
-            <p className="text-sm text-gray-400">Revenue Total</p>
-            <p className="mt-2 text-2xl font-bold">
-              €{totalRevenue.toFixed(2)}
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Revenue Total</p>
+    <p className="mt-2 text-2xl font-bold">
+      €{totalRevenue.toFixed(2)}
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Ventas Totales</p>
+    <p className="mt-2 text-2xl font-bold">{totalSales}</p>
+  </div>
+
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Producto líder</p>
+    <p className="mt-2 truncate text-xl font-bold">
+      {topProduct}
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Score promedio</p>
+    <p className="mt-2 text-2xl font-bold">{avgScore}</p>
+  </div>
+</section>
+
+<section className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-5">
+  <h2 className="mb-4 text-lg font-bold">
+    🧭 Resumen de decisiones
+  </h2>
+
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    {actionSummary.map((item) => (
+      <div
+        key={item.label}
+        className="rounded-xl bg-gray-900 p-4"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{item.emoji}</span>
+
+          <div>
+            <p className="text-xl font-bold">{item.count}</p>
+            <p className="text-sm text-gray-400">
+              {item.label}
             </p>
           </div>
-
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
-            <p className="text-sm text-gray-400">Ventas Totales</p>
-            <p className="mt-2 text-2xl font-bold">{totalSales}</p>
-          </div>
-
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
-            <p className="text-sm text-gray-400">Producto líder</p>
-            <p className="mt-2 truncate text-xl font-bold">
-              {topProduct}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
-            <p className="text-sm text-gray-400">Score promedio</p>
-            <p className="mt-2 text-2xl font-bold">{avgScore}</p>
-          </div>
-        </section>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
 
         <section className="mb-8 grid gap-6 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-1">
