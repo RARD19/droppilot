@@ -32,6 +32,16 @@ export default function Home() {
   'Security'
 ]
 
+const countryOptions = [
+  'Spain',
+  'Germany',
+  'France',
+  'Italy',
+  'Portugal',
+  'Brazil',
+  'Uruguay'
+]
+
   const [session, setSession] = useState<any>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -659,12 +669,23 @@ function getColor(label: string) {
                 onChange={(e) => setPrice(e.target.value)}
               />
 
-              <input
-                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-                placeholder="País"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
+              <select
+  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+  value={country}
+  onChange={(e) => setCountry(e.target.value)}
+>
+  <option value="">Selecciona país</option>
+
+  {!countryOptions.includes(country) && country && (
+    <option value={country}>{country}</option>
+  )}
+
+  {countryOptions.map((option) => (
+    <option key={option} value={option}>
+      {option}
+    </option>
+  ))}
+</select>
 
               <button
                 onClick={addProduct}
