@@ -589,6 +589,34 @@ function getRecommendation(product: any) {
     }
   }
 
+  if (
+  sales > 0 &&
+  hasCost &&
+  margin >= 30 &&
+  totalProfit > 0 &&
+  label === '🔴 WEAK'
+) {
+  return {
+    action: 'Observar',
+    reason: 'Aunque está por debajo de otros productos del radar, ya tiene ventas, margen saludable y profit positivo.',
+    nextStep: 'No escalar todavía, pero seguir monitoreándolo antes de pausarlo.'
+  }
+}
+
+if (
+  sales === 0 &&
+  hasCost &&
+  margin >= 40 &&
+  unitProfit > 0 &&
+  score >= 50
+) {
+  return {
+    action: 'Testear',
+    reason: 'Tiene margen saludable y buen profit por unidad, pero todavía no tiene ventas registradas.',
+    nextStep: 'Hacer una prueba inicial pequeña antes de decidir si escalar o pausar.'
+  }
+}
+  
   if (score < 30 || label === '🔴 WEAK') {
     return {
       action: 'Pausar',
