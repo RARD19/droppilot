@@ -713,14 +713,26 @@ function exportCSV() {
   const link = document.createElement('a')
 
   link.href = url
-  const safeFilter = filter
+
+const safeFilter = filter
   .replace(/[^a-zA-Z0-9]/g, '')
   .trim() || 'Todos'
 
-link.download = `droppilot-${safeFilter}.csv`
-  link.click()
+const now = new Date()
 
-  URL.revokeObjectURL(url)
+const timestamp = now
+  .toISOString()
+  .slice(0, 16)
+  .replace('T', '-')
+  .replace(':', '-')
+
+link.download = `droppilot-${safeFilter}-${timestamp}.csv`
+
+alert(link.download)
+
+link.click()
+
+URL.revokeObjectURL(url)
 }
 
 function getColor(label: string) {
