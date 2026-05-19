@@ -18,6 +18,7 @@ export default function Home() {
 
   const [filter, setFilter] = useState('Todos')
   const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState('score')
 
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
@@ -70,17 +71,39 @@ const countryOptions = [
   .filter((p) => p.profit > 0)
   .sort((a, b) => b.profit - a.profit)
 
-  const filteredProducts = products.filter((p) => {
-  const matchesFilter =
-    filter === 'Todos' ||
-    p.category === filter ||
-    p.decision_label === filter
+const filteredProducts = products
+  .filter((p) => {
+    const matchesFilter =
+      filter === 'Todos' ||
+      p.category === filter ||
+      p.decision_label === filter
 
-  const matchesSearch =
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
 
-  return matchesFilter && matchesSearch
-})
+    return matchesFilter && matchesSearch
+  })
+  .sort((a, b) => {
+    switch (sortBy) {
+      case 'profit':
+        return Number(b.total_profit || 0) - Number(a.total_profit || 0)
+
+      case 'sales':
+        return Number(b.times_sold || 0) - Number(a.times_sold || 0)
+
+      case 'margin':
+        return Number(b.margin_percent || 0) - Number(a.margin_percent || 0)
+
+      case 'revenue':
+        return Number(b.total_revenue || 0) - Number(a.total_revenue || 0)
+
+      default:
+        return (
+          Number(b.raw_score || b.ai_score || 0) -
+          Number(a.raw_score || a.ai_score || 0)
+        )
+    }
+  })
 
   const totalRevenue = products.reduce(
     (acc, p) => acc + Number(p.total_revenue || 0),
@@ -795,6 +818,18 @@ function getColor(label: string) {
   value={searchTerm}
   onChange={(e) => setSearchTerm(e.target.value)}
 />
+
+<select
+  value={sortBy}
+  onChange={(e) => setSortBy(e.target.value)}
+  className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm"
+>
+  <option value="score">Ordenar por score</option>
+  <option value="profit">Ordenar por profit</option>
+  <option value="sales">Ordenar por ventas</option>
+  <option value="margin">Ordenar por margen</option>
+  <option value="revenue">Ordenar por revenue</option>
+</select>
 
             <button
               onClick={simulateSales}
