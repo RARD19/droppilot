@@ -144,52 +144,7 @@ const actionSummary = [
 
       if (data.session) {
 
-async function fetchDailySales() {
-  const fromDate = new Date()
-  fromDate.setDate(fromDate.getDate() - 6)
-  fromDate.setHours(0, 0, 0, 0)
 
-  const { data, error } = await supabase
-    .from('sales')
-    .select('created_at, sale_amount_eur')
-    .gte('created_at', fromDate.toISOString())
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    console.error(error)
-    return
-  }
-
-  const days = []
-
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(date.getDate() - i)
-
-    const key = date.toISOString().slice(0, 10)
-
-    days.push({
-      date: key,
-      dia: date.toLocaleDateString('es-ES', {
-        weekday: 'short'
-      }),
-      ventas: 0,
-      revenue: 0
-    })
-  }
-
-  data?.forEach((sale) => {
-    const key = new Date(sale.created_at).toISOString().slice(0, 10)
-    const day = days.find((d) => d.date === key)
-
-    if (day) {
-      day.ventas += 1
-      day.revenue += Number(sale.sale_amount_eur || 0)
-    }
-  })
-
-  setDailySales(days)
-}
 
         fetchRadar()
       }
@@ -230,7 +185,12 @@ async function fetchDailySales() {
     return
   }
 
-  const days = []
+  const days: {
+    date: string
+    dia: string
+    ventas: number
+    revenue: number
+  }[] = []
 
   for (let i = 6; i >= 0; i--) {
     const date = new Date()
