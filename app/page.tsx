@@ -488,6 +488,62 @@ function getRecommendation(product: any) {
   }
 }
 
+function exportCSV() {
+  const rows = filteredProducts.map((p) => {
+    const recommendation = getRecommendation(p)
+
+    return {
+      Nombre: p.name,
+      Categoria: p.category,
+      Pais: p.target_country,
+      PrecioEUR: p.price_eur,
+      Vendidos: p.times_sold || 0,
+      RevenueEUR: p.total_revenue || 0,
+      Score: Number(p.raw_score || p.ai_score).toFixed(2),
+      Label: p.decision_label,
+      Recomendacion: recommendation.action,
+      Motivo: recommendation.reason,
+      SiguientePaso: recommendation.nextStep
+    }
+  })
+
+  if (rows.length === 0) {
+    alert('No hay productos para exportar')
+    return
+  }
+
+  const headers = Object.keys(rows[0])
+
+  const csv = [
+    headers.join(','),
+    ...rows.map((row) =>
+      headers
+        .map((header) => {
+          const value = String(row[header as keyof typeof row] ?? '')
+          return `"${value.replace(/"/g, '""')}"`
+        })
+        .join(',')
+    )
+  ].join('\n')
+
+  const blob = new Blob([csv], {
+    type: 'text/csv;charset=utf-8;'
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  const safeFilter = filter
+  .replace(/[^a-zA-Z0-9]/g, '')
+  .trim() || 'Todos'
+
+link.download = `droppilot-${safeFilter}.csv`
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
 function getColor(label: string) {
     switch (label) {
       case '🔥 WINNER':
@@ -603,6 +659,13 @@ function getColor(label: string) {
             >
               🗑 Reiniciar mercado
             </button>
+
+            <button
+  onClick={exportCSV}
+  className="rounded-xl bg-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-600"
+>
+  📄 Exportar CSV
+</button>
           </div>
         </section>
 
