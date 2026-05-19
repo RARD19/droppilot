@@ -657,6 +657,12 @@ if (
   }
 }
 
+function clearFilters() {
+  setFilter('Todos')
+  setSearchTerm('')
+  setSortBy('score')
+}
+
 function exportCSV() {
   const rows = filteredProducts.map((p) => {
     const recommendation = getRecommendation(p)
@@ -832,25 +838,33 @@ function getColor(label: string) {
 </select>
 
             <button
-              onClick={simulateSales}
-              className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-500"
-            >
-              ⚡ Simular mercado
-            </button>
+  onClick={simulateSales}
+  className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-500"
+>
+  ⚡ Simular mercado
+</button>
 
-            <button
-              onClick={resetMarket}
-              className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-500"
-            >
-              🗑 Reiniciar mercado
-            </button>
+<button
+  onClick={resetMarket}
+  className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-500"
+>
+  🗑 Reiniciar mercado
+</button>
 
-            <button
+<button
   onClick={exportCSV}
   className="rounded-xl bg-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-600"
 >
   📄 Exportar CSV
 </button>
+
+<button
+  onClick={clearFilters}
+  className="rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700"
+>
+  🧹 Limpiar filtros
+</button>
+
           </div>
         </section>
 
