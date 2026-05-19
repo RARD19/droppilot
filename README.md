@@ -29,6 +29,13 @@ Deployed on Vercel:
 - Sales chart by product
 - Filters by category and opportunity status
 - Protected access for authenticated users only
+- Product cost tracking
+- Unit profit calculation
+- Total profit calculation
+- Real margin KPI
+- Profit by product chart
+- Profit-aware recommendations
+- Profit-weighted radar score
 
 ## Tech Stack
 
@@ -58,6 +65,7 @@ Stores product data such as:
 - target country
 - AI score
 - active status
+- estimated cost
 
 ### sales
 
@@ -88,22 +96,21 @@ A database view used by the dashboard to calculate:
 
 ## How the Scoring Works
 
-DropPilot combines two types of signals:
+DropPilot combines prediction, performance, and profitability signals.
 
-1. Prediction-based score  
-   Used when a product has no sales yet.
-
-2. Performance-based score  
-   Used when the product has sales history.
-
-This allows new products to be evaluated before real data exists, while also allowing proven products to rise based on actual performance.
-
-The current scoring system uses:
+The score considers:
 
 - AI score
-- number of sales
-- total revenue
-- weighted market simulation
+- Number of sales
+- Total revenue
+- Estimated product cost
+- Unit profit
+- Total profit
+- Profit margin
+
+This means the radar does not only rank products by sales or revenue. It also penalizes products with low margins and rewards products that show stronger profit potential.
+
+A product with many sales but weak margin may be ranked lower than a product with fewer sales but stronger profitability.
 
 ## Authentication and Security
 
@@ -120,5 +127,45 @@ The market reset feature is handled through a Supabase RPC function instead of d
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://msympbajofipaqnrysvq.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zeW1wYmFqb2ZpcGFxbnJ5c3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNDc5MDYsImV4cCI6MjA5MzYyMzkwNn0.FXgyZ--wejB-yss2J7THVLFYMk4GylTTbPjLyDdwsPg
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Never commit real environment variables to GitHub.
+
+The same variables must also be configured in Vercel under:
+
+Project Settings → Environment Variables
+
+## Project Status
+
+Current version: MVP
+
+Implemented:
+
+- Authentication
+- Product CRUD
+- Sales tracking
+- Market simulation
+- Market reset
+- Dashboard KPIs
+- Sales chart
+- Daily sales chart
+- Search and filters
+- CSV export
+- Cost tracking
+- Profit metrics
+- Real margin KPI
+- Profit-aware recommendations
+- Profit-weighted radar score
+- Profit by product chart
+- Supabase security cleanup
+
+Possible next improvements:
+
+- Better mobile experience
+- Product ownership per user
+- More advanced recommendation logic
+- Real marketplace data integration
+- Sales history by product
+- Export reports with charts
