@@ -36,6 +36,8 @@ Deployed on Vercel:
 - Profit by product chart
 - Profit-aware recommendations
 - Profit-weighted radar score
+- Supplier URL tracking
+- Product notes
 
 ## Tech Stack
 
@@ -66,6 +68,8 @@ Stores product data such as:
 - AI score
 - active status
 - estimated cost
+- supplier URL
+- product notes
 
 ### sales
 
