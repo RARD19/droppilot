@@ -99,6 +99,8 @@ const countryOptions = [
         ).toFixed(1)
       : 0
 
+      const recommendedProduct = products[0] || null
+
   useEffect(() => {
     async function loadSession() {
       const { data } = await supabase.auth.getSession()
@@ -604,6 +606,49 @@ function getColor(label: string) {
           </div>
         </section>
 
+        {recommendedProduct && (() => {
+  const recommendation = getRecommendation(recommendedProduct)
+
+  return (
+    <section className="mb-8 rounded-2xl border border-blue-800 bg-blue-950/30 p-5">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm font-medium text-blue-300">
+            🏆 Producto recomendado
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">
+            {recommendedProduct.name}
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-400">
+            {recommendedProduct.category} • {recommendedProduct.target_country}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-gray-950 p-4 text-sm md:max-w-xl">
+          <p>
+            <span className="text-gray-400">Acción sugerida:</span>{' '}
+            <span className="font-bold text-blue-300">
+              {recommendation.action}
+            </span>
+          </p>
+
+          <p className="mt-2">
+            <span className="text-gray-400">Motivo:</span>{' '}
+            {recommendation.reason}
+          </p>
+
+          <p className="mt-2">
+            <span className="text-gray-400">Siguiente paso:</span>{' '}
+            {recommendation.nextStep}
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+})()}
+        
         <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
             <p className="text-sm text-gray-400">Revenue Total</p>
