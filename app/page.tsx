@@ -115,7 +115,47 @@ const avgMargin =
         ).toFixed(1)
       : 0
 
-      const recommendedProduct = products[0] || null
+      function getActionPriority(action: string) {
+  switch (action) {
+    case 'Escalar':
+      return 5
+    case 'Seguir probando':
+      return 4
+    case 'Testear':
+      return 3
+    case 'Observar':
+      return 2
+    case 'Analizar':
+      return 1
+    case 'Pausar':
+      return 0
+    default:
+      return 0
+  }
+}
+
+const recommendedProduct =
+  products
+    .map((product) => {
+      const recommendation = getRecommendation(product)
+      const actionPriority = getActionPriority(recommendation.action)
+      const margin = Number(product.margin_percent || 0)
+      const totalProfit = Number(product.total_profit || 0)
+      const score = Number(product.raw_score || product.ai_score || 0)
+      const hasCost = Number(product.cost_eur || 0) > 0
+
+      return {
+        product,
+        recommendationScore:
+          actionPriority * 100000 +
+          (hasCost ? 10000 : 0) +
+          margin * 100 +
+          totalProfit +
+          score
+      }
+    })
+    .sort((a, b) => b.recommendationScore - a.recommendationScore)[0]
+    ?.product || null
 
       const recommendationCounts = products.reduce((acc, product) => {
   const action = getRecommendation(product).action
@@ -455,26 +495,80 @@ function getRecommendation(product: any) {
   const score = Number(product.raw_score || product.ai_score || 0)
   const label = product.decision_label
 
-  if (label === '🔥 WINNER' && sales >= 3 && revenue > 0) {
+  const cost = Number(product.cost_eur || 0)
+  const margin = Number(product.margin_percent || 0)
+  const unitProfit = Number(product.unit_profit || 0)
+  const totalProfit = Number(product.total_profit || 0)
+  const hasCost = cost > 0
+
+  if (hasCost && unitProfit <= 0) {
     return {
-      action: 'Escalar',
-      reason: 'Tiene ventas reales, buen revenue y un score alto.',
-      nextStep: 'Priorizar este producto y probar más presupuesto.'
+      action: 'Pausar',
+      reason: 'El producto no deja ganancia estimada por unidad.',
+      nextStep: 'Revisar costo, precio de venta o proveedor antes de seguir probando.'
     }
   }
 
-  if ((label === '🔥 WINNER' || label === '🟢 STRONG') && sales === 0) {
+  if (hasCost && margin < 15) {
+    return {
+      action: 'Pausar',
+      reason: 'El margen estimado es demasiado bajo para priorizar este producto.',
+      nextStep: 'Buscar mejor costo o subir precio antes de invertir más.'
+    }
+  }
+
+  if (
+    label === '🔥 WINNER' &&
+    sales >= 3 &&
+    revenue > 0 &&
+    (!hasCost || (margin >= 30 && totalProfit > 0))
+  ) {
+    return {
+      action: 'Escalar',
+      reason: hasCost
+        ? 'Tiene ventas reales, buen revenue, margen saludable y profit positivo.'
+        : 'Tiene ventas reales, buen revenue y score alto, pero aún falta cargar costo real.',
+      nextStep: hasCost
+        ? 'Priorizar este producto y probar más presupuesto.'
+        : 'Cargar costo estimado antes de escalar con más seguridad.'
+    }
+  }
+
+  if (
+    (label === '🔥 WINNER' || label === '🟢 STRONG') &&
+    sales === 0
+  ) {
+    if (hasCost && margin < 25) {
+      return {
+        action: 'Observar',
+        reason: 'Tiene potencial, pero el margen estimado no es muy atractivo todavía.',
+        nextStep: 'Comparar con proveedores o ajustar precio antes de testear.'
+      }
+    }
+
     return {
       action: 'Testear',
-      reason: 'Tiene buen potencial, pero todavía no tiene ventas registradas.',
+      reason: hasCost
+        ? 'Tiene buen potencial y margen aceptable, pero todavía no tiene ventas registradas.'
+        : 'Tiene buen potencial, pero todavía no tiene ventas ni costo real cargado.',
       nextStep: 'Hacer una prueba inicial antes de invertir fuerte.'
     }
   }
 
   if (label === '🟢 STRONG' && sales > 0) {
+    if (hasCost && margin < 25) {
+      return {
+        action: 'Observar',
+        reason: 'Tiene señales positivas, pero el margen podría ser bajo para escalar.',
+        nextStep: 'Registrar más datos y revisar si el profit compensa.'
+      }
+    }
+
     return {
       action: 'Seguir probando',
-      reason: 'Ya muestra señales positivas, pero aún puede necesitar más datos.',
+      reason: hasCost
+        ? 'Ya muestra señales positivas y mantiene margen razonable.'
+        : 'Ya muestra señales positivas, pero falta cargar costo real.',
       nextStep: 'Registrar más ventas y observar si mantiene el rendimiento.'
     }
   }
@@ -482,23 +576,27 @@ function getRecommendation(product: any) {
   if (label === '🟡 AVERAGE') {
     return {
       action: 'Observar',
-      reason: 'Tiene potencial medio, pero no destaca claramente frente a otros productos.',
+      reason: hasCost
+        ? 'Tiene potencial medio; conviene compararlo por margen y profit frente a otros productos.'
+        : 'Tiene potencial medio, pero falta cargar costo real para evaluar rentabilidad.',
       nextStep: 'Compararlo con productos similares antes de priorizarlo.'
     }
   }
 
   if (score < 30 || label === '🔴 WEAK') {
-  return {
-    action: 'Pausar',
-    reason: 'Está por debajo de otros productos del radar o no muestra suficiente tracción.',
-    nextStep: 'No priorizarlo por ahora. Revisar precio, país, categoría o esperar más datos.'
+    return {
+      action: 'Pausar',
+      reason: hasCost
+        ? 'Está por debajo de otros productos del radar o no justifica suficiente profit.'
+        : 'Está por debajo de otros productos del radar y falta información de costo.',
+      nextStep: 'No priorizarlo por ahora. Revisar precio, costo, país, categoría o esperar más datos.'
+    }
   }
-}
 
   return {
     action: 'Analizar',
     reason: 'El producto necesita más información antes de tomar una decisión.',
-    nextStep: 'Registrar más datos o simular mercado.'
+    nextStep: 'Registrar más datos, cargar costo real o simular mercado.'
   }
 }
 
