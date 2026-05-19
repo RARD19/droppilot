@@ -22,6 +22,7 @@ export default function Home() {
   const [name, setName] = useState('')
   const [category, setCategory] = useState('')
   const [price, setPrice] = useState('')
+  const [cost, setCost] = useState('')
   const [country, setCountry] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const categoryOptions = [
@@ -262,6 +263,7 @@ const actionSummary = [
     setName('')
     setCategory('')
     setPrice('')
+    setCost('')
     setCountry('')
     setEditingId(null)
   }
@@ -271,6 +273,7 @@ const actionSummary = [
     setName(product.name)
     setCategory(product.category)
     setPrice(String(product.price_eur))
+    setCost(String(product.cost_eur || 0))
     setCountry(product.target_country)
 
     window.scrollTo({
@@ -280,7 +283,7 @@ const actionSummary = [
   }
 
   async function addProduct() {
-    if (!name || !category || !price || !country) {
+    if (!name || !category || !price || !cost || !country) {
       alert('Completa todos los campos')
       return
     }
@@ -292,6 +295,7 @@ const actionSummary = [
           name,
           category,
           price_eur: Number(price),
+          cost_eur: Number(cost),
           target_country: country,
           ai_score:
             Number(price) < 50
@@ -323,6 +327,7 @@ const actionSummary = [
           name,
           category,
           price_eur: Number(price),
+          cost_eur: Number(cost),
           target_country: country,
           ai_score:
             Number(price) < 50
@@ -491,6 +496,10 @@ function exportCSV() {
       Categoria: p.category,
       Pais: p.target_country,
       PrecioEUR: p.price_eur,
+      CostoEUR: p.cost_eur || 0,
+      ProfitUnidadEUR: Number(p.unit_profit || 0).toFixed(2),
+      MargenPercent: Number(p.margin_percent || 0).toFixed(1),
+      ProfitTotalEUR: Number(p.total_profit || 0).toFixed(2),
       Vendidos: p.times_sold || 0,
       RevenueEUR: p.total_revenue || 0,
       Score: Number(p.raw_score || p.ai_score).toFixed(2),
@@ -797,6 +806,13 @@ function getColor(label: string) {
                 onChange={(e) => setPrice(e.target.value)}
               />
 
+              <input
+  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+  placeholder="Costo estimado"
+  value={cost}
+  onChange={(e) => setCost(e.target.value)}
+/>
+
               <select
   className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
   value={country}
@@ -927,6 +943,12 @@ function getColor(label: string) {
 
               <div className="grid gap-2 rounded-xl bg-gray-900 p-4 text-sm">
                 <p>💰 Precio: €{p.price_eur}</p>
+
+<p>🏷 Costo: €{Number(p.cost_eur || 0).toFixed(2)}</p>
+<p>📈 Margen: {Number(p.margin_percent || 0).toFixed(1)}%</p>
+<p>💸 Profit unidad: €{Number(p.unit_profit || 0).toFixed(2)}</p>
+<p>🧾 Profit total: €{Number(p.total_profit || 0).toFixed(2)}</p>
+
                 <p>
                   📊 Score: {Number(p.raw_score || p.ai_score).toFixed(2)}
                 </p>
