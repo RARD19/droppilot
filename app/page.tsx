@@ -86,15 +86,10 @@ const countryOptions = [
   0
 )
 
-const avgMargin =
-  products.length > 0
-    ? (
-        products.reduce(
-          (acc, p) => acc + Number(p.margin_percent || 0),
-          0
-        ) / products.length
-      ).toFixed(1)
-    : 0
+const realMargin =
+  totalRevenue > 0
+    ? ((totalProfit / totalRevenue) * 100).toFixed(1)
+    : '0.0'
 
   const topProduct =
     products.length > 0
@@ -793,7 +788,7 @@ function getColor(label: string) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-medium text-blue-300">
-            🏆 Producto recomendado
+            🏆 Mejor candidato actual
           </p>
 
           <h2 className="mt-2 text-2xl font-bold">
@@ -844,11 +839,11 @@ function getColor(label: string) {
   </div>
 
   <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
-    <p className="text-sm text-gray-400">Margen promedio</p>
-    <p className="mt-2 text-2xl font-bold">
-      {avgMargin}%
-    </p>
-  </div>
+  <p className="text-sm text-gray-400">Margen real</p>
+  <p className="mt-2 text-2xl font-bold">
+    {realMargin}%
+  </p>
+</div>
 
   <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
     <p className="text-sm text-gray-400">Ventas Totales</p>
