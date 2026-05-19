@@ -59,6 +59,17 @@ const countryOptions = [
   .filter((p) => p.ventas > 0)
   .sort((a, b) => b.ventas - a.ventas)
 
+  const profitData = products
+  .map((p) => ({
+    name:
+      p.name.length > 14
+        ? p.name.slice(0, 14) + '...'
+        : p.name,
+    profit: Number(p.total_profit || 0)
+  }))
+  .filter((p) => p.profit > 0)
+  .sort((a, b) => b.profit - a.profit)
+
   const filteredProducts = products.filter((p) => {
   const matchesFilter =
     filter === 'Todos' ||
@@ -890,120 +901,159 @@ function getColor(label: string) {
 </section>
 
         <section className="mb-8 grid gap-6 lg:grid-cols-3">
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-1">
-            <h2 className="mb-4 text-lg font-bold">
-              {editingId ? 'Editar producto' : 'Agregar producto'}
-            </h2>
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-1">
+    <h2 className="mb-4 text-lg font-bold">
+      {editingId ? 'Editar producto' : 'Agregar producto'}
+    </h2>
 
-            <div className="grid gap-3">
-              <input
-                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-                placeholder="Nombre"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+    <div className="grid gap-3">
+      <input
+        className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+        placeholder="Nombre"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
 
-              <select
-  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  <option value="">Selecciona categoría</option>
+      <select
+        className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="">Selecciona categoría</option>
 
-  {!categoryOptions.includes(category) && category && (
-    <option value={category}>{category}</option>
-  )}
+        {!categoryOptions.includes(category) && category && (
+          <option value={category}>{category}</option>
+        )}
 
-  {categoryOptions.map((option) => (
-    <option key={option} value={option}>
-      {option}
-    </option>
-  ))}
-</select>
+        {categoryOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
 
-              <input
-                className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-                placeholder="Precio"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
+      <input
+        className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+        placeholder="Precio"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
 
-              <input
-  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-  placeholder="Costo estimado"
-  value={cost}
-  onChange={(e) => setCost(e.target.value)}
-/>
+      <input
+        className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+        placeholder="Costo estimado"
+        value={cost}
+        onChange={(e) => setCost(e.target.value)}
+      />
 
-              <select
-  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
-  value={country}
-  onChange={(e) => setCountry(e.target.value)}
->
-  <option value="">Selecciona país</option>
+      <select
+        className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+        value={country}
+        onChange={(e) => setCountry(e.target.value)}
+      >
+        <option value="">Selecciona país</option>
 
-  {!countryOptions.includes(country) && country && (
-    <option value={country}>{country}</option>
-  )}
+        {!countryOptions.includes(country) && country && (
+          <option value={country}>{country}</option>
+        )}
 
-  {countryOptions.map((option) => (
-    <option key={option} value={option}>
-      {option}
-    </option>
-  ))}
-</select>
+        {countryOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
 
-              <button
-                onClick={addProduct}
-                className="rounded-xl bg-blue-600 p-3 text-sm font-semibold hover:bg-blue-500"
-              >
-                {editingId ? 'Actualizar producto' : 'Generar producto'}
-              </button>
+      <button
+        onClick={addProduct}
+        className="rounded-xl bg-blue-600 p-3 text-sm font-semibold hover:bg-blue-500"
+      >
+        {editingId ? 'Actualizar producto' : 'Generar producto'}
+      </button>
 
-              {editingId && (
-                <button
-                  onClick={clearForm}
-                  className="rounded-xl bg-gray-800 p-3 text-sm font-semibold hover:bg-gray-700"
-                >
-                  Cancelar edición
-                </button>
-              )}
-            </div>
-          </div>
+      {editingId && (
+        <button
+          onClick={clearForm}
+          className="rounded-xl bg-gray-800 p-3 text-sm font-semibold hover:bg-gray-700"
+        >
+          Cancelar edición
+        </button>
+      )}
+    </div>
+  </div>
 
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5 lg:col-span-2">
-            <h2 className="mb-4 text-lg font-bold">📊 Ventas por producto</h2>
+  <div className="grid gap-6 lg:col-span-2">
+    <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+      <h2 className="mb-4 text-lg font-bold">
+        📊 Ventas por producto
+      </h2>
 
-            <div style={{ width: '100%', height: 320 }}>
-              <ResponsiveContainer>
-                <BarChart data={chartData}>
-  <XAxis
-    dataKey="name"
-    interval={0}
-    angle={-20}
-    textAnchor="end"
-    height={70}
-  />
-  <YAxis allowDecimals={false} />
-  <Tooltip
-    contentStyle={{
-      backgroundColor: '#111827',
-      border: '1px solid #374151',
-      borderRadius: '12px',
-      color: '#ffffff'
-    }}
-    cursor={{ fill: '#1f2937' }}
-  />
-  <Bar
-    dataKey="ventas"
-    fill="#22c55e"
-    radius={[8, 8, 0, 0]}
-  />
-</BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </section>
+      <div style={{ width: '100%', height: 320 }}>
+        <ResponsiveContainer>
+          <BarChart data={chartData}>
+            <XAxis
+              dataKey="name"
+              interval={0}
+              angle={-20}
+              textAnchor="end"
+              height={70}
+            />
+            <YAxis allowDecimals={false} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#111827',
+                border: '1px solid #374151',
+                borderRadius: '12px',
+                color: '#ffffff'
+              }}
+              cursor={{ fill: '#1f2937' }}
+            />
+            <Bar
+              dataKey="ventas"
+              fill="#22c55e"
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+
+    <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+      <h2 className="mb-4 text-lg font-bold">
+        💸 Profit por producto
+      </h2>
+
+      <div style={{ width: '100%', height: 320 }}>
+        <ResponsiveContainer>
+          <BarChart data={profitData}>
+            <XAxis
+              dataKey="name"
+              interval={0}
+              angle={-20}
+              textAnchor="end"
+              height={70}
+            />
+            <YAxis />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#111827',
+                border: '1px solid #374151',
+                borderRadius: '12px',
+                color: '#ffffff'
+              }}
+              cursor={{ fill: '#1f2937' }}
+            />
+            <Bar
+              dataKey="profit"
+              fill="#f59e0b"
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  </div>
+</section>
 
         <div className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-5">
   <h2 className="mb-4 text-lg font-bold">
