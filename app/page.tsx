@@ -793,7 +793,7 @@ function getColor(label: string) {
 
           <button
             onClick={logout}
-            className="rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700"
+            className="w-full rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700 md:w-auto"
           >
             Cerrar sesión
           </button>
@@ -804,7 +804,7 @@ function getColor(label: string) {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm"
+              className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm sm:w-auto"
             >
               <option>Todos</option>
               <option>🔥 WINNER</option>
@@ -819,7 +819,7 @@ function getColor(label: string) {
             </select>
 
             <input
-  className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm outline-none focus:border-blue-500"
+  className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm outline-none focus:border-blue-500 sm:w-64"
   placeholder="Buscar producto..."
   value={searchTerm}
   onChange={(e) => setSearchTerm(e.target.value)}
@@ -828,7 +828,7 @@ function getColor(label: string) {
 <select
   value={sortBy}
   onChange={(e) => setSortBy(e.target.value)}
-  className="rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm"
+  className="w-full rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 text-sm sm:w-auto"
 >
   <option value="score">Ordenar por score</option>
   <option value="profit">Ordenar por profit</option>
@@ -839,28 +839,28 @@ function getColor(label: string) {
 
             <button
   onClick={simulateSales}
-  className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-500"
+  className="w-full rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium hover:bg-purple-500 sm:w-auto"
 >
   ⚡ Simular mercado
 </button>
 
 <button
   onClick={resetMarket}
-  className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-500"
+  className="w-full rounded-xl bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-500 sm:w-auto"
 >
   🗑 Reiniciar mercado
 </button>
 
 <button
   onClick={exportCSV}
-  className="rounded-xl bg-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-600"
+  className="w-full rounded-xl bg-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-600 sm:w-auto"
 >
   📄 Exportar CSV
 </button>
 
 <button
   onClick={clearFilters}
-  className="rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700"
+  className="w-full rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-700 sm:w-auto"
 >
   🧹 Limpiar filtros
 </button>
