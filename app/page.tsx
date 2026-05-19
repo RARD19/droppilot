@@ -81,6 +81,21 @@ const countryOptions = [
     0
   )
 
+  const totalProfit = products.reduce(
+  (acc, p) => acc + Number(p.total_profit || 0),
+  0
+)
+
+const avgMargin =
+  products.length > 0
+    ? (
+        products.reduce(
+          (acc, p) => acc + Number(p.margin_percent || 0),
+          0
+        ) / products.length
+      ).toFixed(1)
+    : 0
+
   const topProduct =
     products.length > 0
       ? products.reduce((max, p) =>
@@ -715,11 +730,25 @@ function getColor(label: string) {
   )
 })()}
         
-        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
   <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
     <p className="text-sm text-gray-400">Revenue Total</p>
     <p className="mt-2 text-2xl font-bold">
       €{totalRevenue.toFixed(2)}
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Profit Total</p>
+    <p className="mt-2 text-2xl font-bold">
+      €{totalProfit.toFixed(2)}
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
+    <p className="text-sm text-gray-400">Margen promedio</p>
+    <p className="mt-2 text-2xl font-bold">
+      {avgMargin}%
     </p>
   </div>
 
