@@ -27,6 +27,7 @@ export default function Home() {
   const [country, setCountry] = useState('')
   const [supplierUrl, setSupplierUrl] = useState('')
   const [notes, setNotes] = useState('')
+  const [productStatus, setProductStatus] = useState('Pendiente')
   const [editingId, setEditingId] = useState<number | null>(null)
   const categoryOptions = [
   'Electronics',
@@ -44,6 +45,14 @@ const countryOptions = [
   'Portugal',
   'Brazil',
   'Uruguay'
+]
+
+const statusOptions = [
+  'Pendiente',
+  'Testeando',
+  'Pausado',
+  'Ganador',
+  'Descartado'
 ]
 
   const [session, setSession] = useState<any>(null)
@@ -78,7 +87,8 @@ const filteredProducts = products
     const matchesFilter =
       filter === 'Todos' ||
       p.category === filter ||
-      p.decision_label === filter
+      p.decision_label === filter ||
+      p.product_status === filter
 
     const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -346,27 +356,33 @@ const actionSummary = [
   }
 
   function clearForm() {
-    setName('')
-    setCategory('')
-    setPrice('')
-    setCost('')
-    setCountry('')
-    setEditingId(null)
-  }
+  setName('')
+  setCategory('')
+  setPrice('')
+  setCost('')
+  setCountry('')
+  setSupplierUrl('')
+  setNotes('')
+  setProductStatus('Pendiente')
+  setEditingId(null)
+}
 
   function editProduct(product: any) {
-    setEditingId(product.id)
-    setName(product.name)
-    setCategory(product.category)
-    setPrice(String(product.price_eur))
-    setCost(String(product.cost_eur || 0))
-    setCountry(product.target_country)
+  setEditingId(product.id)
+  setName(product.name)
+  setCategory(product.category)
+  setPrice(String(product.price_eur))
+  setCost(String(product.cost_eur || 0))
+  setCountry(product.target_country)
+  setSupplierUrl(product.supplier_url || '')
+  setNotes(product.notes || '')
+  setProductStatus(product.product_status || 'Pendiente')
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
-  }
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
 
   async function addProduct() {
     if (!name || !category || !price || !cost || !country) {
@@ -385,6 +401,7 @@ const actionSummary = [
   target_country: country,
   supplier_url: supplierUrl,
   notes,
+  product_status: productStatus,
   ai_score:
     Number(price) < 50
       ? 85
@@ -419,6 +436,7 @@ const actionSummary = [
     target_country: country,
     supplier_url: supplierUrl,
     notes,
+    product_status: productStatus,
     ai_score:
       Number(price) < 50
         ? 85
@@ -677,6 +695,7 @@ function exportCSV() {
       Nombre: p.name,
       Categoria: p.category,
       Pais: p.target_country,
+      Estado: p.product_status || 'Pendiente',
       Proveedor: p.supplier_url || '',
       Notas: p.notes || '',
       PrecioEUR: p.price_eur,
@@ -836,6 +855,11 @@ function getColor(label: string) {
               <option>Home</option>
               <option>Tech</option>
               <option>Security</option>
+              <option>Pendiente</option>
+              <option>Testeando</option>
+              <option>Pausado</option>
+              <option>Ganador</option>
+              <option>Descartado</option>
             </select>
 
             <input
@@ -1074,6 +1098,18 @@ function getColor(label: string) {
   value={notes}
   onChange={(e) => setNotes(e.target.value)}
 />
+
+<select
+  className="rounded-xl border border-gray-700 bg-gray-900 p-3 text-sm outline-none focus:border-blue-500"
+  value={productStatus}
+  onChange={(e) => setProductStatus(e.target.value)}
+>
+  {statusOptions.map((option) => (
+    <option key={option} value={option}>
+      {option}
+    </option>
+  ))}
+</select>
       
       <button
         onClick={addProduct}
@@ -1237,6 +1273,7 @@ function getColor(label: string) {
                 </p>
                 <p>📦 Vendidos: {p.times_sold || 0}</p>
                 <p>💵 Revenue: €{p.total_revenue || 0}</p>
+                <p>📌 Estado: {p.product_status || 'Pendiente'}</p>
                 <p>
                   📈 Top:{' '}
                   {p.percentile
