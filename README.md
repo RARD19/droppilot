@@ -43,6 +43,9 @@ Deployed on Vercel:
 - Product notes
 - Product status tracking
 - Product status summary
+- Recent sales history
+- Recent sale deletion
+- Status-aware recommendations
 
 ## Tech Stack
 
@@ -174,6 +177,9 @@ Implemented:
 - Product notes
 - Product status tracking
 - Product status summary
+- Recent sales history
+- Recent sale deletion
+- Status-aware recommendations
 
 Possible next improvements:
 
