@@ -545,37 +545,43 @@ async function fetchRecentSales() {
 }
 
   async function simulateSales() {
-    if (products.length === 0) {
-      alert('No hay productos para simular')
-      return
-    }
+  const eligibleProducts = products.filter(
+    (p) =>
+      p.product_status !== 'Pausado' &&
+      p.product_status !== 'Descartado'
+  )
 
-    const weightedProducts = products.flatMap((p) => {
-      const score = Number(p.raw_score || p.ai_score || 1)
-      const weight = Math.max(1, Math.floor(score / 10))
-
-      return Array(weight).fill(p)
-    })
-
-    for (let i = 0; i < 20; i++) {
-      const randomProduct =
-        weightedProducts[
-          Math.floor(Math.random() * weightedProducts.length)
-        ]
-
-      await supabase
-        .from('sales')
-        .insert([
-          {
-            product_id: randomProduct.id,
-            sale_amount_eur: randomProduct.price_eur,
-            sale_amount_brl: randomProduct.price_eur * 6.2
-          }
-        ])
-    }
-
-    await fetchRadar()
+  if (eligibleProducts.length === 0) {
+    alert('No hay productos activos para simular. Revisa los estados.')
+    return
   }
+
+  const weightedProducts = eligibleProducts.flatMap((p) => {
+    const score = Number(p.raw_score || p.ai_score || 1)
+    const weight = Math.max(1, Math.floor(score / 10))
+
+    return Array(weight).fill(p)
+  })
+
+  for (let i = 0; i < 20; i++) {
+    const randomProduct =
+      weightedProducts[
+        Math.floor(Math.random() * weightedProducts.length)
+      ]
+
+    await supabase
+      .from('sales')
+      .insert([
+        {
+          product_id: randomProduct.id,
+          sale_amount_eur: randomProduct.price_eur,
+          sale_amount_brl: randomProduct.price_eur * 6.2
+        }
+      ])
+  }
+
+  await fetchRadar()
+}
 
   async function resetMarket() {
   const confirmed = confirm(
