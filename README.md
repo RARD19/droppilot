@@ -28,6 +28,9 @@ Deployed on Vercel:
 - Average score calculation
 - Sales chart by product
 - Filters by category and opportunity status
+- Daily sales chart
+- Product sorting by score, profit, sales, margin, and revenue
+- Clear filters button
 - Protected access for authenticated users only
 - Product cost tracking
 - Unit profit calculation
@@ -38,6 +41,8 @@ Deployed on Vercel:
 - Profit-weighted radar score
 - Supplier URL tracking
 - Product notes
+- Product status tracking
+- Product status summary
 
 ## Tech Stack
 
@@ -70,6 +75,7 @@ Stores product data such as:
 - estimated cost
 - supplier URL
 - product notes
+- product status
 
 ### sales
 
@@ -164,6 +170,10 @@ Implemented:
 - Profit-weighted radar score
 - Profit by product chart
 - Supabase security cleanup
+- Supplier URL tracking
+- Product notes
+- Product status tracking
+- Product status summary
 
 Possible next improvements:
 
