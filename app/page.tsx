@@ -418,7 +418,23 @@ async function fetchRecentSales() {
   setEditingId(null)
 }
 
-  function editProduct(product: any) {
+async function updateProductStatus(id: number, status: string) {
+  const { error } = await supabase
+    .from('products')
+    .update({
+      product_status: status
+    })
+    .eq('id', id)
+
+  if (error) {
+    alert(error.message)
+    return
+  }
+
+  await fetchRadar()
+}
+
+function editProduct(product: any) {
   setEditingId(product.id)
   setName(product.name)
   setCategory(product.category)
@@ -1450,6 +1466,19 @@ function getColor(label: string) {
                 <p>📦 Vendidos: {p.times_sold || 0}</p>
                 <p>💵 Revenue: €{p.total_revenue || 0}</p>
                 <p>📌 Estado: {p.product_status || 'Pendiente'}</p>
+
+<select
+  value={p.product_status || 'Pendiente'}
+  onChange={(e) => updateProductStatus(p.id, e.target.value)}
+  className="mt-2 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm"
+>
+  {statusOptions.map((option) => (
+    <option key={option} value={option}>
+      {option}
+    </option>
+  ))}
+</select>
+
                 <p>
                   📈 Top:{' '}
                   {p.percentile
