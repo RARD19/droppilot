@@ -525,6 +525,25 @@ async function fetchRecentSales() {
     }
   }
 
+  async function deleteSale(id: number) {
+  const confirmed = confirm(
+    '¿Eliminar esta venta?'
+  )
+
+  if (!confirmed) return
+
+  const { error } = await supabase.rpc('delete_sale', {
+    p_sale_id: id
+  })
+
+  if (error) {
+    alert(error.message)
+    return
+  }
+
+  await fetchRadar()
+}
+
   async function simulateSales() {
     if (products.length === 0) {
       alert('No hay productos para simular')
@@ -1340,9 +1359,18 @@ function getColor(label: string) {
                 </p>
               </div>
 
-              <p className="font-bold text-green-300">
-                €{Number(sale.sale_amount_eur || 0).toFixed(2)}
-              </p>
+              <div className="flex items-center gap-3">
+  <p className="font-bold text-green-300">
+    €{Number(sale.sale_amount_eur || 0).toFixed(2)}
+  </p>
+
+  <button
+    onClick={() => deleteSale(sale.id)}
+    className="rounded-lg bg-red-700 px-3 py-1 text-xs font-medium hover:bg-red-600"
+  >
+    Eliminar
+  </button>
+</div>
             </div>
           </div>
         )
