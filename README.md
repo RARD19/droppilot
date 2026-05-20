@@ -46,6 +46,8 @@ Deployed on Vercel:
 - Recent sales history
 - Recent sale deletion
 - Status-aware recommendations
+- Quick product status updates from product cards
+- Paused and discarded products excluded from market simulation
 
 ## Tech Stack
 
@@ -180,6 +182,8 @@ Implemented:
 - Recent sales history
 - Recent sale deletion
 - Status-aware recommendations
+- Quick product status updates
+- Simulation excludes paused and discarded products
 
 Possible next improvements:
 
