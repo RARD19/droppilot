@@ -232,6 +232,40 @@ const actionSummary = [
   }
 ]
 
+const statusCounts = products.reduce((acc, product) => {
+  const status = product.product_status || 'Pendiente'
+  acc[status] = (acc[status] || 0) + 1
+  return acc
+}, {} as Record<string, number>)
+
+const statusSummary = [
+  {
+    label: 'Pendiente',
+    emoji: '📌',
+    count: statusCounts['Pendiente'] || 0
+  },
+  {
+    label: 'Testeando',
+    emoji: '🧪',
+    count: statusCounts['Testeando'] || 0
+  },
+  {
+    label: 'Pausado',
+    emoji: '⏸',
+    count: statusCounts['Pausado'] || 0
+  },
+  {
+    label: 'Ganador',
+    emoji: '🏆',
+    count: statusCounts['Ganador'] || 0
+  },
+  {
+    label: 'Descartado',
+    emoji: '🗑',
+    count: statusCounts['Descartado'] || 0
+  }
+]
+
   useEffect(() => {
     async function loadSession() {
       const { data } = await supabase.auth.getSession()
@@ -1002,6 +1036,32 @@ function getColor(label: string) {
 
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
     {actionSummary.map((item) => (
+      <div
+        key={item.label}
+        className="rounded-xl bg-gray-900 p-4"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{item.emoji}</span>
+
+          <div>
+            <p className="text-xl font-bold">{item.count}</p>
+            <p className="text-sm text-gray-400">
+              {item.label}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-5">
+  <h2 className="mb-4 text-lg font-bold">
+    📦 Estado de productos
+  </h2>
+
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    {statusSummary.map((item) => (
       <div
         key={item.label}
         className="rounded-xl bg-gray-900 p-4"
