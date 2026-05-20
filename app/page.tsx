@@ -15,6 +15,7 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [dailySales, setDailySales] = useState<any[]>([])
+  const [recentSales, setRecentSales] = useState<any[]>([])
 
   const [filter, setFilter] = useState('Todos')
   const [searchTerm, setSearchTerm] = useState('')
@@ -351,6 +352,21 @@ const statusSummary = [
 
   setDailySales(days)
 }
+
+async function fetchRecentSales() {
+  const { data, error } = await supabase
+    .from('sales')
+    .select('id, product_id, sale_amount_eur, created_at')
+    .order('created_at', { ascending: false })
+    .limit(10)
+
+  if (error) {
+    console.error(error)
+    return
+  }
+
+  setRecentSales(data || [])
+}
   
   async function fetchRadar() {
     setLoading(true)
@@ -368,6 +384,7 @@ const statusSummary = [
     }
 
     await fetchDailySales()
+    await fetchRecentSales()
     
     setLoading(false)
   }
@@ -1289,6 +1306,49 @@ function getColor(label: string) {
 </BarChart>
     </ResponsiveContainer>
   </div>
+</div>
+
+<div className="mb-8 rounded-2xl border border-gray-800 bg-gray-950 p-5">
+  <h2 className="mb-4 text-lg font-bold">
+    🧾 Ventas recientes
+  </h2>
+
+  {recentSales.length === 0 ? (
+    <p className="text-sm text-gray-400">
+      Todavía no hay ventas registradas.
+    </p>
+  ) : (
+    <div className="grid gap-3">
+      {recentSales.map((sale) => {
+        const product = products.find(
+          (p) => p.id === sale.product_id
+        )
+
+        return (
+          <div
+            key={sale.id}
+            className="rounded-xl bg-gray-900 p-4 text-sm"
+          >
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold">
+                  {product?.name || 'Producto eliminado'}
+                </p>
+
+                <p className="text-gray-400">
+                  {new Date(sale.created_at).toLocaleString('es-ES')}
+                </p>
+              </div>
+
+              <p className="font-bold text-green-300">
+                €{Number(sale.sale_amount_eur || 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )}
 </div>
 
         {loading && (
