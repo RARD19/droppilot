@@ -618,6 +618,32 @@ function getRecommendation(product: any) {
   const score = Number(product.raw_score || product.ai_score || 0)
   const label = product.decision_label
 
+  const status = product.product_status || 'Pendiente'
+
+if (status === 'Descartado') {
+  return {
+    action: 'Pausar',
+    reason: 'Este producto fue marcado como descartado manualmente.',
+    nextStep: 'No priorizarlo salvo que decidas reactivarlo más adelante.'
+  }
+}
+
+if (status === 'Pausado') {
+  return {
+    action: 'Pausar',
+    reason: 'Este producto está marcado como pausado.',
+    nextStep: 'Mantenerlo fuera de pruebas hasta revisar precio, costo, proveedor o estrategia.'
+  }
+}
+
+if (status === 'Ganador') {
+  return {
+    action: 'Escalar',
+    reason: 'Este producto fue marcado como ganador y debe mantenerse como prioridad.',
+    nextStep: 'Seguir monitoreando ventas, margen y proveedor antes de aumentar demasiado el riesgo.'
+  }
+}
+
   const cost = Number(product.cost_eur || 0)
   const margin = Number(product.margin_percent || 0)
   const unitProfit = Number(product.unit_profit || 0)
@@ -1348,7 +1374,7 @@ function getColor(label: string) {
             key={sale.id}
             className="rounded-xl bg-gray-900 p-4 text-sm"
           >
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-semibold">
                   {product?.name || 'Producto eliminado'}
@@ -1360,17 +1386,17 @@ function getColor(label: string) {
               </div>
 
               <div className="flex items-center gap-3">
-  <p className="font-bold text-green-300">
-    €{Number(sale.sale_amount_eur || 0).toFixed(2)}
-  </p>
+                <p className="font-bold text-green-300">
+                  €{Number(sale.sale_amount_eur || 0).toFixed(2)}
+                </p>
 
-  <button
-    onClick={() => deleteSale(sale.id)}
-    className="rounded-lg bg-red-700 px-3 py-1 text-xs font-medium hover:bg-red-600"
-  >
-    Eliminar
-  </button>
-</div>
+                <button
+                  onClick={() => deleteSale(sale.id)}
+                  className="rounded-lg bg-red-700 px-3 py-1 text-xs font-medium hover:bg-red-600"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
           </div>
         )
@@ -1378,10 +1404,6 @@ function getColor(label: string) {
     </div>
   )}
 </div>
-
-        {loading && (
-          <p className="mb-4 text-gray-400">Cargando productos...</p>
-        )}
 
         {filteredProducts.length === 0 && (
   <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6 text-gray-400">
