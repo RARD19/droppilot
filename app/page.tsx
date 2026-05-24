@@ -36,7 +36,14 @@ export default function Home() {
   'Lifestyle',
   'Home',
   'Tech',
-  'Security'
+  'Security',
+  'Pet',
+  'Kitchen',
+  'Car',
+  'Beauty',
+  'Fitness',
+  'Office',
+  'Cleaning'
 ]
 
 const countryOptions = [
@@ -1021,6 +1028,13 @@ function getColor(label: string) {
               <option>Home</option>
               <option>Tech</option>
               <option>Security</option>
+              <option>Pet</option>
+              <option>Kitchen</option>
+              <option>Car</option>
+              <option>Beauty</option>
+              <option>Fitness</option>
+              <option>Office</option>
+              <option>Cleaning</option>
               <option>Pendiente</option>
               <option>Testeando</option>
               <option>Pausado</option>
