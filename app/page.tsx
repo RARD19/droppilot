@@ -12,6 +12,7 @@ import {
 import { supabase } from '@/lib/supabase'
 
 export default function Home() {
+  const [aiLoadingId, setAiLoadingId] = useState<number | null>(null)
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [dailySales, setDailySales] = useState<any[]>([])
@@ -416,6 +417,53 @@ async function fetchRecentSales() {
   setNotes('')
   setProductStatus('Pendiente')
   setEditingId(null)
+}
+
+async function analyzeProduct(product: any) {
+  try {
+    setAiLoadingId(product.id)
+
+    const response = await fetch('/api/analyze-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(product)
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      alert(result.error || 'Error analizando producto con IA')
+      return
+    }
+
+    const analysis = result.analysis
+
+    const { error } = await supabase
+      .from('products')
+      .update({
+        ai_analysis_score: analysis.ai_score,
+        ai_verdict: analysis.verdict,
+        ai_suggested_price: analysis.suggested_price,
+        ai_main_risk: analysis.main_risk,
+        ai_reasoning: analysis.reasoning,
+        ai_next_step: analysis.next_step,
+        ai_analyzed_at: new Date().toISOString()
+      })
+      .eq('id', product.id)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    await fetchRadar()
+  } catch (error: any) {
+    alert(error.message || 'Error analizando producto con IA')
+  } finally {
+    setAiLoadingId(null)
+  }
 }
 
 async function updateProductStatus(id: number, status: string) {
@@ -1512,6 +1560,43 @@ function getColor(label: string) {
   </div>
 )}
 
+{(p.ai_verdict || p.ai_reasoning) && (
+  <div className="mt-4 rounded-xl border border-blue-900 bg-blue-950/40 p-4 text-sm">
+    <h3 className="mb-3 font-bold text-blue-300">
+      🤖 Análisis IA
+    </h3>
+
+    {p.ai_analysis_score !== null && p.ai_analysis_score !== undefined && (
+      <p>
+        Score IA: {Number(p.ai_analysis_score).toFixed(0)}/100
+      </p>
+    )}
+
+    {p.ai_verdict && (
+      <p>Veredicto: {p.ai_verdict}</p>
+    )}
+
+    {p.ai_suggested_price && (
+      <p>Precio sugerido: {p.ai_suggested_price}</p>
+    )}
+
+    {p.ai_main_risk && (
+      <p>Riesgo principal: {p.ai_main_risk}</p>
+    )}
+
+    {p.ai_reasoning && (
+      <p className="mt-2 text-gray-300">
+        Motivo: {p.ai_reasoning}
+      </p>
+    )}
+
+    {p.ai_next_step && (
+      <p className="mt-2 text-gray-300">
+        Siguiente paso: {p.ai_next_step}
+      </p>
+    )}
+  </div>
+)}
 
               {(() => {
   const recommendation = getRecommendation(p)
@@ -1540,7 +1625,7 @@ function getColor(label: string) {
   )
 })()}
 
-              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-4">
                 <button
                   onClick={() => registerSale(p)}
                   className="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium hover:bg-green-500"
@@ -1554,6 +1639,8 @@ function getColor(label: string) {
                 >
                   ✏️ Editar
                 </button>
+
+                {/* IA preparada, pero desactivada temporalmente hasta tener API disponible */}
 
                 <button
                   onClick={() => deleteProduct(p.id)}
