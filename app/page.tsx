@@ -596,6 +596,19 @@ function editProduct(product: any) {
     }
   }
 
+  async function registerInterest(productId: number) {
+  const { error } = await supabase.rpc('increment_product_interest', {
+    p_product_id: productId
+  })
+
+  if (error) {
+    alert(error.message)
+    return
+  }
+
+  await fetchRadar()
+}
+
   async function deleteSale(id: number) {
   const confirmed = confirm(
     '¿Eliminar esta venta?'
@@ -877,6 +890,15 @@ function exportCSV() {
       MargenPercent: Number(p.margin_percent || 0).toFixed(1),
       ProfitTotalEUR: Number(p.total_profit || 0).toFixed(2),
       Vendidos: p.times_sold || 0,
+      Interesados: p.interested_count || 0,
+ConversionPercent:
+  Number(p.interested_count || 0) > 0
+    ? (
+        (Number(p.times_sold || 0) /
+          Number(p.interested_count || 0)) *
+        100
+      ).toFixed(1)
+    : '0.0',
       RevenueEUR: p.total_revenue || 0,
       Score: Number(p.raw_score || p.ai_score).toFixed(2),
       Label: p.decision_label,
@@ -1527,6 +1549,18 @@ function getColor(label: string) {
                 </p>
                 <p>📦 Vendidos: {p.times_sold || 0}</p>
                 <p>💵 Revenue: €{p.total_revenue || 0}</p>
+                <p>👀 Interesados: {p.interested_count || 0}</p>
+
+<p>
+  🎯 Conversión:{' '}
+  {Number(p.interested_count || 0) > 0
+    ? `${(
+        (Number(p.times_sold || 0) /
+          Number(p.interested_count || 0)) *
+        100
+      ).toFixed(0)}%`
+    : '--'}
+</p>
                 <p>📌 Estado: {p.product_status || 'Pendiente'}</p>
 
 <select
@@ -1640,6 +1674,13 @@ function getColor(label: string) {
 })()}
 
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-4">
+<button
+  onClick={() => registerInterest(p.id)}
+  className="rounded-xl bg-purple-700 px-3 py-2 text-sm font-medium hover:bg-purple-600"
+>
+  👀 Interesado
+</button>
+
                 <button
                   onClick={() => registerSale(p)}
                   className="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium hover:bg-green-500"
