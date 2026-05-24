@@ -18,6 +18,14 @@ CREATE TABLE IF NOT EXISTS public.products (
   supplier_url text DEFAULT '',
   notes text DEFAULT '',
   product_status text NOT NULL DEFAULT 'Pendiente',
+  interested_count integer NOT NULL DEFAULT 0,
+  ai_analysis_score numeric,
+  ai_verdict text DEFAULT '',
+  ai_suggested_price text DEFAULT '',
+  ai_main_risk text DEFAULT '',
+  ai_reasoning text DEFAULT '',
+  ai_next_step text DEFAULT '',
+  ai_analyzed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -126,6 +134,14 @@ WITH base AS (
     COALESCE(p.supplier_url, '') AS supplier_url,
     COALESCE(p.notes, '') AS notes,
     COALESCE(p.product_status, 'Pendiente') AS product_status,
+    COALESCE(p.interested_count, 0)::integer AS interested_count,
+    p.ai_analysis_score,
+    COALESCE(p.ai_verdict, '') AS ai_verdict,
+    COALESCE(p.ai_suggested_price, '') AS ai_suggested_price,
+    COALESCE(p.ai_main_risk, '') AS ai_main_risk,
+    COALESCE(p.ai_reasoning, '') AS ai_reasoning,
+    COALESCE(p.ai_next_step, '') AS ai_next_step,
+    p.ai_analyzed_at,
     COALESCE(pm.times_sold, 0) AS times_sold,
     COALESCE(pm.total_revenue, 0)::numeric AS total_revenue
   FROM public.products p
@@ -146,6 +162,14 @@ scored AS (
     supplier_url,
     notes,
     product_status,
+    interested_count,
+    ai_analysis_score,
+    ai_verdict,
+    ai_suggested_price,
+    ai_main_risk,
+    ai_reasoning,
+    ai_next_step,
+    ai_analyzed_at,
 
     CASE
       WHEN cost_eur > 0
@@ -225,7 +249,15 @@ ranked AS (
     total_profit,
     supplier_url,
     notes,
-    product_status
+    product_status,
+    interested_count,
+    ai_analysis_score,
+    ai_verdict,
+    ai_suggested_price,
+    ai_main_risk,
+    ai_reasoning,
+    ai_next_step,
+    ai_analyzed_at
   FROM scored
 )
 
@@ -251,8 +283,18 @@ SELECT
   total_profit,
   supplier_url,
   notes,
-  product_status
+  product_status,
+  interested_count,
+  ai_analysis_score,
+  ai_verdict,
+  ai_suggested_price,
+  ai_main_risk,
+  ai_reasoning,
+  ai_next_step,
+  ai_analyzed_at
 FROM ranked;
+
+GRANT SELECT ON public.product_radar TO authenticated;
 
 -- =========================================================
 -- RPC: RESET MARKET
@@ -296,6 +338,23 @@ BEGIN
   WHERE id = p_sale_id;
 
   PERFORM public.refresh_product_metrics(v_product_id);
+END;
+$$;
+
+-- =========================================================
+-- RPC: INCREMENT PRODUCT INTEREST
+-- =========================================================
+
+CREATE OR REPLACE FUNCTION public.increment_product_interest(p_product_id bigint)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.products
+  SET interested_count = COALESCE(interested_count, 0) + 1
+  WHERE id = p_product_id;
 END;
 $$;
 
@@ -378,6 +437,9 @@ GRANT EXECUTE ON FUNCTION public.reset_market() TO authenticated;
 
 REVOKE ALL ON FUNCTION public.delete_sale(bigint) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.delete_sale(bigint) TO authenticated;
+
+REVOKE ALL ON FUNCTION public.increment_product_interest(bigint) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.increment_product_interest(bigint) TO authenticated;
 
 REVOKE ALL ON FUNCTION public.refresh_product_metrics(bigint) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.refresh_product_metrics(bigint) TO authenticated;
